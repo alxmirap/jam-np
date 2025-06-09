@@ -219,9 +219,16 @@ Announcement = Header ++ Final
 
 Node -> Node
 
---> Handshake AND <-- Handshake (In parallel)
+--> Handshake
 loop {
-    --> Announcement OR <-- Announcement (Either side may send)
+    --> Announcement
+}
+
+And in parallel:
+
+<-- Handshake
+loop {
+    <-- Announcement
 }
 ```
 
