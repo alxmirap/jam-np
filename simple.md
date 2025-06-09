@@ -603,7 +603,10 @@ introduce preimages, and by validators to gossip these preimages to other valida
 
 The recipient of the announcement is expected to follow up by requesting the preimage using
 protocol 143, provided the preimage has been requested on chain by the given service and the
-recipient is not already in possession of it.
+recipient is not already in possession of it. In the case where the sender of the announcement is a
+non-validator node, it is expected to keep the connection open for a reasonable time (eg 10
+seconds) to allow this request to be made; if the connection is closed before the request can be
+made, the recipient is not expected to reopen it.
 
 Once a validator has obtained a requested preimage, it should announce possession to its neighbours
 in the grid structure.
