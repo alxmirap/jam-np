@@ -49,7 +49,7 @@ defined in the serialization codec appendix of the GP.
 
 The protocol name, version, and chain are identified using QUIC/TLS "ALPN" (Application Layer
 Protocol Negotiation). The (ASCII-encoded) protocol identifier should be either `jamnp-s/V/H` or
-`jamnp-s/V/H/builder`. Here `V` is the protocol version, `0`, and `H` is the first 8 nibbles of the
+`jamnp-s/V/H/builder`. Here `V` is the protocol version, `1`, and `H` is the first 8 nibbles of the
 hash of the chain's genesis header, in lower-case hexadecimal.
 
 The `/builder` suffix should always be permitted by the side accepting the connection, but only
@@ -170,9 +170,12 @@ Core Index = u16
 
 Ed25519 Signature = [u8; 64]
 
+Segments-Root = [u8; 32]
 Erasure-Root = [u8; 32]
 Shard Index = u16
+Work-Package Bundle = [u8] (Encoded as in GP)
 Bundle Shard = [u8]
+Segment = [u8; 4104]
 Segment Shard = [u8; 4104 / R] (R is the recovery threshold; 342 with 1023 validators, 2 with 6)
 ```
 
@@ -352,7 +355,7 @@ Submission of a work-package from a builder to a guarantor.
 The second message should contain all the extrinsic data referenced by the work-package, formatted
 as in work-package bundles, which are defined in the Computation of Work Results section of the GP.
 
-Note that the content of imported segments _should not_ be sent; it is the responsibility of the
+Note that the content of imported segments cam be provided optionaly; If the list is empty it is the responsibility of the
 receiving guarantor to fetch this data from the availability system.
 
 ```
@@ -363,6 +366,7 @@ Builder -> Guarantor
 
 --> Core Index ++ Work-Package
 --> [Extrinsic] (Message size should equal sum of extrinsic data lengths)
+--> [Segment] OR [] (Contents of all imported segments or a zero sized message)
 --> FIN
 <-- FIN
 ```
@@ -396,9 +400,7 @@ mappings cannot be verified, the guarantor may, at their discretion, either refu
 work-package or blindly trust the mappings.
 
 ```
-Segments-Root = [u8; 32]
 Segments-Root Mappings = len++[Work-Package Hash ++ Segments-Root]
-Work-Package Bundle = As in GP
 
 Guarantor -> Guarantor
 
@@ -531,6 +533,23 @@ Auditor -> Assurer
 <-- FIN
 ```
 
+
+
+### CE 146: Bundle request
+
+Request for a work-package bundle.
+
+This protocol should be used by auditors to request work-package bundle from guarantors
+for auditing. In case the guarantor fails to provide the valid bundle, the auditor should fall back to recovering the bundle with CE 138
+```
+Auditor -> Guarantor
+
+--> [Work-Package Hash]
+--> FIN
+<-- [Work-Package Bundle]
+<-- FIN
+```
+
 ### CE 139/140: Segment shard request
 
 Request for one or more segment shards.
@@ -581,6 +600,29 @@ Guarantor -> Assurer
 [Protocol 140 only] for each segment shard {
 [Protocol 140 only]     <-- Justification
 [Protocol 140 only] }
+<-- FIN
+```
+
+### CE 147: Segment request
+
+Request for one or more segments.
+
+This protocol should be used by guarantors or builders to request import segments from other guarantors in order
+to complete work-package bundles.
+
+The number of segments requested in a single stream should not exceed $2W_M$ ($W_M = 3072$,
+this constant is defined in the GP).
+
+If the guarantor fails to return the valid data, the requestor should fall back to using CE 139/140
+
+```
+Segment Index = u16
+
+Guarantor -> Guarantor
+
+--> [Segment-Root ++ len++[Segment Index]]
+--> FIN
+<-- [Segment]
 <-- FIN
 ```
 
