@@ -379,7 +379,6 @@ Note that the bundle parts are sent in separate messages to allow for authorizin
 
 The import proof corresponds to $\mathit{J}$ as defined in the gray paper.
 
-
 ```
 Work-Package = As in GP
 Extrinsic = [u8]
@@ -557,8 +556,6 @@ Auditor -> Assurer
 <-- Justification
 <-- FIN
 ```
-
-
 
 ### CE 147: Bundle request
 
