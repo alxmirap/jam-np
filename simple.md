@@ -49,7 +49,7 @@ defined in the serialization codec appendix of the GP.
 
 The protocol name, version, and chain are identified using QUIC/TLS "ALPN" (Application Layer
 Protocol Negotiation). The (ASCII-encoded) protocol identifier should be either `jamnp-s/V/H` or
-`jamnp-s/V/H/builder`. Here `V` is the protocol version, `1`, and `H` is the first 8 nibbles of the
+`jamnp-s/V/H/builder`. Here `V` is the protocol version, `0`, and `H` is the first 8 nibbles of the
 hash of the chain's genesis header, in lower-case hexadecimal.
 
 The `/builder` suffix should always be permitted by the side accepting the connection, but only
@@ -387,7 +387,8 @@ Segments-Root Mappings = len++[Work-Package Hash ++ Segments-Root]
 
 Builder -> Guarantor
 
---> Core Index ++ Segments-Root Mappings ++Work-Package
+--> Core Index ++ Segments-Root Mappings
+--> Work-Package
 --> [Extrinsic] (Message size should equal sum of extrinsic data lengths)
 --> [Segment] (All imported segments)
 --> [Import-Proof] (Import proofs for all imported segments)
@@ -568,7 +569,7 @@ Auditor -> Guarantor
 
 --> Erasure-Root
 --> FIN
-<-- [Work-Package Bundle]
+<-- Work-Package Bundle
 <-- FIN
 ```
 
