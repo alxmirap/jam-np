@@ -644,7 +644,7 @@ is expected to be checked against a different database.
 ```
 Preimage = [u8]
 
-Node -> Node
+Validator -> Node
 
 --> Hash
 --> FIN
