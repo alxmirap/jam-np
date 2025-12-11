@@ -800,13 +800,13 @@ The guarantees is a bounded vector of at most 3 elements, preceded by the guaran
 
 ```
 Validity = 0 (Invalid) OR 1 (Valid) (Single byte)
-Guarantee = Validator Index ++ Ed25519 Signature
-Guarantees = Slot ++ len++[Guarantee] (2 or 3 elements only)
-OptGuarantees = 0 (Single byte) (if Validity is 1) OR 1++Guarantees (if Validity is 0)
+GuaranteeSignature = Validator Index ++ Ed25519 Signature
+Guarantee = Slot ++ len++[GuaranteeSignature] (2 or 3 elements only)
 
 Auditor -> Validator
 
---> Epoch Index ++ Validator Index ++ Validity ++ Work-Report Hash ++ Ed25519 Signature ++ OptGuarantees
+--> Epoch Index ++ Validator Index ++ Validity ++ Work-Report Hash ++ Ed25519 Signature
+--> Guarantee [Optional, this message is present if and only if Validity == 0]
 --> FIN
 <-- FIN
 ```
